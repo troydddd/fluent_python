@@ -41,7 +41,7 @@ class Order:
         return fmt.format(self.total(), self.due())
 
 # 之前这个部分是用抽象基类定义，然后在根据每个策略分别进行定义
-def fiedlity_promo(order):
+def fidelity_promo(order):
     """为积分为1000或以上的顾客提供5%的折扣"""
     return order.total() * 0.05 if order.customer.fidelity >= 1000 else 0
 
@@ -61,3 +61,21 @@ def large_order_promo(order):
         return order.total() * 0.07
     return 0
 
+
+promos = [fidelity_promo, bulk_item_promo, large_order_promo]
+
+
+def best_promo(order):
+    """选择可用的最佳折扣"""
+    return max(promo(order) for promo in promos)
+
+
+if __name__ == '__main__':
+    joe = Customer('John Doe', 0)
+    ann = Customer('Ann Smish', 1100)
+    cart = [LineItem('banana', 4, 0.5), LineItem('apple', 10, 1.5), LineItem('watermelon', 5, 5.0)]
+    print(Order(joe, cart, fidelity_promo))
+    print(Order(ann, cart, fidelity_promo))
+    long_order = [LineItem(str(item_code), 1, 1.0) for item_code in range(10)]
+    print(Order(joe, long_order, large_order_promo))
+    print(Order(joe, long_order, best_promo))
